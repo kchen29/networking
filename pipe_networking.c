@@ -18,13 +18,24 @@ int server_handshake(int *to_client) {
     printf("Failed making wkp: %s\n", strerror(errno));
   else
     printf("Made wkp\n");
-  int fd = open("WKP", O_RDONLY);
+  int wkp = open("WKP", O_RDONLY);
   char buf[HANDSHAKE_BUFFER_SIZE];
-  read(fd, buf, HANDSHAKE_BUFFER_SIZE);
-  close(fd);
+  //receive client message
+  read(wkp, buf, HANDSHAKE_BUFFER_SIZE);
+  printf("read buf: %s\n", buf);
+  remove("WKP");
 
-  *to_client = atoi(buf);
-  return fd;
+  //write to client
+  int fd = open(buf, O_WRONLY);
+  write(fd, buf, HANDSHAKE_BUFFER_SIZE);
+  printf("write buf: %s\n", buf);
+  
+  //read from client
+  read(wkp, buf, HANDSHAKE_BUFFER_SIZE);
+  printf("read buf: %s\n", buf);
+
+  *to_client = fd;
+  return wkp;
 }
 
 
@@ -45,11 +56,23 @@ int client_handshake(int *to_server) {
     printf("Failed makingpipe: %s\n", strerror(errno));
   else
     printf("Made pipe\n");
-  int fd = open("WKP", O_WRONLY);
-  write(fd, pipename, HANDSHAKE_BUFFER_SIZE);
-  close(fd);
-  *to_server = fd;
+  int wkp = open("WKP", O_WRONLY);
+  //write to server
+  write(wkp, pipename, HANDSHAKE_BUFFER_SIZE);
+  printf("wrote pipename: %s\n", pipename);
+  
+  //read from server
+  int fd = open(pipename, O_RDONLY);
+  char buf[HANDSHAKE_BUFFER_SIZE];
+  read(fd, buf, HANDSHAKE_BUFFER_SIZE);
+  printf("read buf: %s\n", buf);
+  remove(pipename);
+  
+  //write to server again
+  write(wkp, buf, HANDSHAKE_BUFFER_SIZE);
+  printf("wrote buf: %s\n", buf);
 
-  fd = open(pipename, O_RDONLY);
+  *to_server = wkp;
+
   return fd;
 }
