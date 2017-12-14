@@ -12,13 +12,13 @@ int main() {
   while(1){
     char buf[BUFFER_SIZE];
     //get text from stdin
-    printf("Input text:\n");
+    printf("\n====================\nPlease input text: ");
     fgets(buf, BUFFER_SIZE, stdin);
 
     //checks to see if buf is q
     if(strcmp(buf, "q\n") == 0){
       write(to_server, "done!", BUFFER_SIZE);
-      printf("client is done!\n");
+      printf("\n\nThis client is done!\n");
       exit(1);
     }
 
@@ -26,14 +26,13 @@ int main() {
 
     //write text to server
     write(to_server, buf, BUFFER_SIZE);
-    printf("wrote buf: %s\n", buf);
+    printf("Sent text to server: \n\t%s", buf);
 
     //read text from server
     int ret;
     ret = read(from_server, buf, BUFFER_SIZE);
-    printf("ret: %d\n", ret);
-  
-    printf("read buf: %s\n", buf);
+
+    printf("Text received from server: \n\t%s", buf);
   
 
   }
