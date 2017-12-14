@@ -16,6 +16,7 @@ int main() {
     fgets(buf, BUFFER_SIZE, stdin);
 
     //checks to see if buf is q
+    //q exits the client's program
     if(strcmp(buf, "q\n") == 0){
       write(to_server, "done!", BUFFER_SIZE);
       printf("\n\nThis client is done!\n");
